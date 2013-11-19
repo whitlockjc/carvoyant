@@ -48,7 +48,7 @@ At this point, you can use the module like any other:
 var client = require('carvoyant').createClient({apiKey: '...', securityToken: '...'});
 ````
 
-### Development
+## Development
 
 This project uses best of breed libraries and tooling:
 
@@ -58,6 +58,16 @@ This project uses best of breed libraries and tooling:
 * [Lodash](http://lodash.com/) - Utility library for JavaScript (We're current piecing together the pieces we need
 instead of using the whole library to make the browser builds as small as possible)
 * [Superagent](http://visionmedia.github.io/superagent/) - JavaScript AJAX library for the browser and Node.js
+
+### Running Tests and Building
+
+Right now the default Grunt command will run all tests (browser and Node.js) and create browser binaries for the
+project.  To do this, all you have to do is run `grunt` from the command line, this of course assumes you installed
+the project dependencies after cloning the repository using `npm install`.  You can also generate
+[JSDoc](http://usejsdoc.org/) documentation using `grunt jsdoc`.  (This will eventually be incorporated into the
+build/release cycle so we can host the API documentation online.)  Finally, to run the test suite you need to copy
+the template client configuration from **test/client_config.js.tmpl** to **test/client_config.js** and populate it
+with valid Carvoyant API credentials.
 
 ## Future Plans
 
