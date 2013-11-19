@@ -1,0 +1,14 @@
+{
+    "tags": {
+        "allowUnknownTags": true
+    },
+    "plugins": ["plugins/markdown"],
+    "markdown": {
+        "parser": "gfm"
+    },
+    "templates": {
+        "cleverLinks": false,
+        "monospaceLinks": false
+    },
+    "jsVersion": 180
+}

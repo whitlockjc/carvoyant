@@ -1,0 +1,5 @@
+.tm_properties
+docs/
+node_modules/
+test/client_config.js
+test/carvoyant-test.js
