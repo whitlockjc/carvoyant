@@ -48,6 +48,9 @@ At this point, you can use the module like any other:
 var client = require('carvoyant').createClient({apiKey: '...', securityToken: '...'});
 ````
 
+For more details on what APIs are available and how to use them, please use the source until I can get the
+items listed at the bottom of the page complete.
+
 ## Development
 
 This project uses best of breed libraries and tooling:
@@ -78,3 +81,5 @@ with valid Carvoyant API credentials.
 * Create an example application online
 * Tag an initial release
 * Generate a sourcemap for the generated version and link to it
+* Automate GitHub Pages with landing page, documentation, API documentation, etc.
+* Flesh the API out more to be less raw
