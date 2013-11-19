@@ -1,3 +1,5 @@
+/* Grunt configuration */
+
 'use strict';
 
 module.exports = function(grunt) {
@@ -18,7 +20,7 @@ module.exports = function(grunt) {
       },
       test: {
         files: {
-          'test/carvoyant-test.js': ['test/karma-testrunner.js']
+          'test/carvoyant-test.js': ['test/karma_testrunner.js']
         }
       }
     },
