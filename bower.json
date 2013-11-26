@@ -1,6 +1,6 @@
 {
   "name": "carvoyant",
-  "main": "carvoyant.js",
+  "description": "The Carvoyant API client library.",
   "version": "0.0.2",
   "homepage": "https://github.com/whitlockjc/carvoyant",
   "authors": [
@@ -9,7 +9,6 @@
       "email": "jwhitlock@apache.org"
     }
   ],
-  "description": "The Carvoyant API client library.",
   "keywords": [
     "carvoyant"
   ],
@@ -24,5 +23,6 @@
     "bower_components",
     "test",
     "tests"
-  ]
+  ],
+  "main": "carvoyant.js"
 }
