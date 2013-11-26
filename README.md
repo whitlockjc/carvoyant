@@ -33,9 +33,6 @@ var client = carvoyant.createClient({apiKey: '...', securityToken: '...'});
 
 ### Node.js
 
-**Note:** The usage pattern documented will depend on this module being registered with NPM.  When that is taken
-care of, this note will be removed.
-
 Installation is as simple as any other Node.js module using [NPM](https://npmjs.org/):
 
 ```bash
@@ -74,12 +71,9 @@ with valid Carvoyant API credentials.
 
 ## Future Plans
 
-* Get this into NPM
 * Get this into Bower/Component
-* Hook up to Travis
 * Update this documentation
 * Create an example application online
-* Tag an initial release
 * Generate a sourcemap for the generated version and link to it
 * Automate GitHub Pages with landing page, documentation, API documentation, etc.
 * Flesh the API out more to be less raw
