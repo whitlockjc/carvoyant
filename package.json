@@ -60,7 +60,8 @@
     "karma-requirejs": "~0.1.0",
     "karma-script-launcher": "~0.1.0",
     "lodash.isarray": "~2.3.0",
-    "lodash.map": "~2.3.0"
+    "lodash.map": "~2.3.0",
+    "grunt-release": "~0.6.0"
   },
   "main": "lib/carvoyant",
   "engines": {

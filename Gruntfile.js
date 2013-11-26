@@ -81,6 +81,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-jsdoc');
   grunt.loadNpmTasks('grunt-karma');
+  grunt.loadNpmTasks('grunt-release');
 
   // Default task.
   grunt.registerTask('default', ['clean', 'jshint', 'nodeunit', 'browserify', 'karma', 'uglify', 'clean:test']);
