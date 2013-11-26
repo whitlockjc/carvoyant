@@ -8,7 +8,15 @@ this library has complete feature parity with the documented Carvoyant API Refer
 
 Below are usage scenarios for both the browser and Node.js.
 
-### Browser
+### Browser (Bower)
+
+Installation is as simple as any other browser component using [Bower](http://bower.io/):
+
+```bash
+bower install carvoyant --save
+```
+
+### Browser (Manual)
 
 Browser support for the JavaScript Carvoyant API is provided by [browserify](http://browserify.org/).  This offers
 a zero configuration deployment, meaning you do not need to download/install third party dependencies to get this
@@ -71,7 +79,6 @@ with valid Carvoyant API credentials.
 
 ## Future Plans
 
-* Get this into Bower/Component
 * Update this documentation
 * Create an example application online
 * Generate a sourcemap for the generated version and link to it

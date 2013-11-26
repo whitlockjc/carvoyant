@@ -1,0 +1,28 @@
+{
+  "name": "carvoyant",
+  "main": "carvoyant.js",
+  "version": "0.0.2",
+  "homepage": "https://github.com/whitlockjc/carvoyant",
+  "authors": [
+    {
+      "name": "Jeremy Whitlock",
+      "email": "jwhitlock@apache.org"
+    }
+  ],
+  "description": "The Carvoyant API client library.",
+  "keywords": [
+    "carvoyant"
+  ],
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/whitlockjc/carvoyant.git"
+  },
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
