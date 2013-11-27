@@ -8,15 +8,7 @@ this library has complete feature parity with the documented Carvoyant API Refer
 
 Below are usage scenarios for both the browser and Node.js.
 
-### Browser (Bower)
-
-Installation is as simple as any other browser component using [Bower](http://bower.io/):
-
-```bash
-bower install carvoyant --save
-```
-
-### Browser (Manual)
+### Browser
 
 Browser support for the JavaScript Carvoyant API is provided by [browserify](http://browserify.org/).  This offers
 a zero configuration deployment, meaning you do not need to download/install third party dependencies to get this
@@ -27,17 +19,24 @@ of the file:
 * [carvoyant.min.js](https://raw.github.com/whitlockjc/carvoyant/master/carvoyant.min.js): _32kb_, minified, compressed
 and no sourcemap
 
-Here is a little HTML snippet showing how you could use the bleeding edge version in your existing page:
+Installation can be as simple as downloading the proper JavaScript file and installing it or installing it via Bower.
+Installation via Bower is as simple as any other browser component using [Bower](http://bower.io/):
+
+```bash
+bower install carvoyant --save
+```
+
+Now that you've installed it into your project, here is an example HTML snippet to get you started:
 
 ```html
 <!-- ... -->
-<script src="https://raw.github.com/whitlockjc/carvoyant/master/carvoyant.js"></script>
-<!-- <script src="https://raw.github.com/whitlockjc/carvoyant/master/carvoyant.min.js"></script> -->
+<script src="bower_components/carvoyant/carvoyant.js"></script>
+<!-- <script src="bower_components/carvoyant/carvoyant.min.js"></script> -->
 <script>
 var client = carvoyant.createClient({apiKey: '...', securityToken: '...'});
 </script>
 <!-- ... -->
-````
+```
 
 ### Node.js
 
