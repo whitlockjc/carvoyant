@@ -19,8 +19,8 @@ of the file:
 * [carvoyant.min.js](https://raw.github.com/whitlockjc/carvoyant/master/carvoyant.min.js): _32kb_, minified, compressed
 and no sourcemap
 
-Installation can be as simple as downloading the proper JavaScript file and installing it or installing it via Bower.
-Installation via Bower is as simple as any other browser component using [Bower](http://bower.io/):
+Installation can be as simple as downloading the proper JavaScript file into your project or installing it via
+[Bower](http://bower.io/) which is as simple as installing any other browser component using Bower:
 
 ```bash
 bower install carvoyant --save
