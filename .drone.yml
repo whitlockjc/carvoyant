@@ -1,3 +1,0 @@
-image: bradrydzewski/node:0.8
-script:
-  - grunt jshint nodeunit
