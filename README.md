@@ -1,7 +1,7 @@
 # JavaScript Carvoyant API
 
 The JavaScript Carvoyant API for both the browser and Node.js.  This library was created using the
-[Carvoyant API Reference](http://confluence.carvoyant.com/display/PUBDEV/API+Reference) and as of writing this,
+[Carvoyant API Reference](http://confluence.carvoyant.com/display/PUBDEV/Carvoyant+API) and as of writing this,
 this library has complete feature parity with the documented Carvoyant API Reference.
 
 ## Usage
