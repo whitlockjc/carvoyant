@@ -4,6 +4,13 @@ The JavaScript Carvoyant API for both the browser and Node.js.  This library was
 [Carvoyant API Reference](http://confluence.carvoyant.com/display/PUBDEV/Carvoyant+API) and as of writing this,
 this library has complete feature parity with the documented Carvoyant API Reference.
 
+## Release Notes
+
+* **0.0.4 (TBD)** - Add missing Carvoyant APIs
+* **0.0.3 (2014 Mar 8)** - Build including [Pull Request #1 (Use query params or POST body based on API)][pr1]
+* **0.0.2 (2013 Nov 26)** - Miscellaneous minor refactorings
+* **0.0.1 (2013 Nov 19)** - Initial release
+
 ## Usage
 
 Below are usage scenarios for both the browser and Node.js.
@@ -76,10 +83,4 @@ build/release cycle so we can host the API documentation online.)  Finally, to r
 the template client configuration from **test/client_config.js.tmpl** to **test/client_config.js** and populate it
 with valid Carvoyant API credentials.
 
-## Future Plans
-
-* Update this documentation
-* Create an example application online
-* Generate a sourcemap for the generated version and link to it
-* Automate GitHub Pages with landing page, documentation, API documentation, etc.
-* Flesh the API out more to be less raw
+[pr1]: https://github.com/whitlockjc/carvoyant/pull/1
