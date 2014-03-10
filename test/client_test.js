@@ -14,6 +14,7 @@ var _ = {
     each: require('lodash.foreach'),
     find: require('lodash.find'),
     isArray: require('lodash.isarray'),
+    isBoolean: require('lodash.isboolean'),
     isNumber: require('lodash.isnumber'),
     isObject: require('lodash.isobject'),
     isUndefined: require('lodash.isundefined'),
@@ -504,6 +505,89 @@ exports.testTripDetails = function (test) {
 
 };
 
-// TODO: client.constraintDetails and client.vehicleConstraints are untested
-//       The reason for this is there is no API to create constraints and the list constraints API returns a 404
-//       instead of a 200 with an empty array when there are no constraints for a vehicle.
+/**
+ * Test that calls to {@link Client#vehicleConstraints} work as expected.
+ */
+exports.testVehicleConstraints = function (test) {
+
+  var client = new Client(realConfig);
+
+  try {
+    client.vehicleConstraints();
+  } catch (err) {
+    test.ok(err instanceof TypeError);
+    test.strictEqual('vehicleId must be defined.', err.message);
+  }
+
+  if (realConfig.vehicleIdWithConstraints) {
+    client.vehicleConstraints(realConfig.vehicleIdWithConstraints, function (res) {
+
+      test.strictEqual(200, res.status);
+      test.ok(_.isArray(res.body.constraints));
+
+      // Obligatory nodeunit completion signal
+      test.done();
+
+    });
+  } else {
+    // Obligatory nodeunit completion signal
+    test.done();
+  }
+
+};
+
+/**
+ * Test that calls to {@link Client#constraintDetails} work as expected.
+ */
+exports.testConstraintDetails = function (test) {
+
+  var client = new Client(realConfig);
+
+  try {
+    client.vehicleConstraints();
+  } catch (err) {
+    test.ok(err instanceof TypeError);
+    test.strictEqual('vehicleId must be defined.', err.message);
+  }
+
+  try {
+    client.vehicleConstraints(createdVehicle.vehicleId);
+  } catch (err) {
+    test.ok(err instanceof TypeError);
+    test.strictEqual('constraintId must be defined.', err.message);
+  }
+
+  try {
+    client.vehicleConstraints(createdVehicle.vehicleId, function (res) {
+
+      // Should never happen, here just to make the test fail when it does
+      test.ok(res.status === 0);
+
+    }, {
+      activeOnly: 123
+    });
+  } catch (err) {
+    test.ok(err instanceof TypeError);
+    test.strictEqual('activeOnly must be a Boolean.', err.message);
+  }
+
+  if (realConfig.vehicleIdWithConstraints) {
+    client.vehicleConstraints(realConfig.vehicleIdWithConstraints, function (res) {
+
+      client.constraintDetails(realConfig.vehicleIdWithConstraints, res.body.constraints[0].id, function (res2) {
+
+        test.strictEqual(200, res2.status);
+        test.ok(_.isBoolean(res2.body.constraint.active));
+
+        // Obligatory nodeunit completion signal
+        test.done();
+
+      });
+
+    });
+  } else {
+    // Obligatory nodeunit completion signal
+    test.done();
+  }
+
+};
