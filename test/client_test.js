@@ -340,38 +340,45 @@ exports.testMakeRequestInvalidArgument = function (test) {
 
 /**
  * Test that calls to {@link Client#nextPage} and {@link Client#prevPage} work as expected.
+ *
+ * Note: Skipped if your client_config.js is missing the vehicleIdWithTripData option.
  */
 exports.testNextPageAndPrevPage = function (test) {
 
   var client = new Client(realConfig);
 
-  client.vehicleTrips(realConfig.vehicleIdWithTripData, function (res) {
+  if (realConfig.vehicleIdWithTripData) {
+    client.vehicleTrips(realConfig.vehicleIdWithTripData, function (res) {
 
-    test.strictEqual(1, res.body.trip.length);
-    test.ok(!_.contains(_.map(res.body.actions, function (action) { return action.name; }), 'previous'));
+      test.strictEqual(1, res.body.trip.length);
+      test.ok(!_.contains(_.map(res.body.actions, function (action) { return action.name; }), 'previous'));
 
-    client.nextPage(res, function (res2) {
+      client.nextPage(res, function (res2) {
 
-      var actions = _.map(res2.body.actions, function (action) { return action.name; });
+        var actions = _.map(res2.body.actions, function (action) { return action.name; });
 
-      test.strictEqual(1, res2.body.trip.length);
-      test.ok(_.contains(actions, 'previous'));
-      test.ok(_.contains(actions, 'next'));
+        test.strictEqual(1, res2.body.trip.length);
+        test.ok(_.contains(actions, 'previous'));
+        test.ok(_.contains(actions, 'next'));
 
-      client.prevPage(res2, function (res4) {
+        client.prevPage(res2, function (res4) {
 
-        test.ok(!_.contains(_.map(res4.body.actions, function (action) { return action.name; }), 'previous'));
+          test.ok(!_.contains(_.map(res4.body.actions, function (action) { return action.name; }), 'previous'));
 
-        // Obligatory nodeunit completion signal
-        test.done();
+          // Obligatory nodeunit completion signal
+          test.done();
+
+        });
 
       });
 
+    }, {
+      searchLimit: 1
     });
-
-  }, {
-    searchLimit: 1
-  });
+  } else {
+    // Obligatory nodeunit completion signal
+    test.done();
+  }
 
 };
 
@@ -466,27 +473,34 @@ exports.testVehicleDataSet = function (test) {
 
 /**
  * Test that calls to {@link Client#tripDetails} work as expected.
+ *
+ * Note: Skipped if your client_config.js is missing the vehicleIdWithTripData option.
  */
 exports.testTripDetails = function (test) {
 
   var client = new Client(realConfig);
 
-  client.vehicleTrips(realConfig.vehicleIdWithTripData, function (res) {
+  if (realConfig.vehicleIdWithTripData) {
+    client.vehicleTrips(realConfig.vehicleIdWithTripData, function (res) {
 
-    var trip = res.body.trip[0];
+      var trip = res.body.trip[0];
 
-    client.tripDetails(realConfig.vehicleIdWithTripData, trip.id, function (res2) {
+      client.tripDetails(realConfig.vehicleIdWithTripData, trip.id, function (res2) {
 
-      test.strictEqual(trip.id, res2.body.trip.id);
+        test.strictEqual(trip.id, res2.body.trip.id);
 
-      // Obligatory nodeunit completion signal
-      test.done();
+        // Obligatory nodeunit completion signal
+        test.done();
 
+      });
+
+    }, {
+      searchLimit: 1
     });
-
-  }, {
-    searchLimit: 1
-  });
+  } else {
+    // Obligatory nodeunit completion signal
+    test.done();
+  }
 
 };
 
