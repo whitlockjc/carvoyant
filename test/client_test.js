@@ -430,22 +430,49 @@ exports.testVehicleData = function (test) {
 
   var client = new Client(realConfig);
 
-  client.vehicles(function (res) {
+  try {
+    client.vehicleData();
+  } catch (err) {
+    test.ok(err instanceof TypeError);
+    test.strictEqual('vehicleId must be defined.', err.message);
+  }
 
-    var vehicle = res.body.vehicle[0];
+  client.vehicleData(createdVehicle.vehicleId, function (res) {
 
-    client.vehicleData(vehicle.deviceId, function (res) {
+    test.strictEqual(200, res.status);
+    test.strictEqual(-1, (_.isUndefined(res.req.path) ? res.req.url : res.req.path).indexOf('mostRecentOnly'));
+    test.ok(_.isArray(res.body.data));
 
-      test.strictEqual(-1, (_.isUndefined(res.req.path) ? res.req.url : res.req.path).indexOf('mostRecentOnly'));
-      test.ok(_.isArray(res.body.data));
-      test.ok(res.body.data.length > 0);
+    // Obligatory nodeunit completion signal
+    test.done();
 
-      // Obligatory nodeunit completion signal
-      test.done();
+  }, {
+    mostRecentOnly: false
+  });
 
-    }, {
-      mostRecentOnly: false
-    });
+};
+
+/**
+ * Test that calls to {@link Client#vehicleDataSet} work as expected.
+ */
+exports.testVehicleDataSet = function (test) {
+
+  var client = new Client(realConfig);
+
+  try {
+    client.vehicleDataSet();
+  } catch (err) {
+    test.ok(err instanceof TypeError);
+    test.strictEqual('vehicleId must be defined.', err.message);
+  }
+
+  client.vehicleDataSet(createdVehicle.vehicleId, function (res) {
+
+    test.strictEqual(200, res.status);
+    test.ok(_.isArray(res.body.dataSet));
+
+    // Obligatory nodeunit completion signal
+    test.done();
 
   });
 
