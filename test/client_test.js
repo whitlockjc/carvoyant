@@ -202,13 +202,6 @@ exports.testListVehicles = function (test) {
     test.strictEqual(200, res.status);
     test.ok(_.isArray(res.body.vehicle));
 
-    // Make sure we found our created vehicle
-    test.ok(!_.isUndefined(_.find(res.body.vehicle, function (vehicle) {
-
-      return vehicle.label === createdVehicle.label;
-
-    })));
-
     // Obligatory nodeunit completion signal
     test.done();
 
@@ -352,39 +345,32 @@ exports.testNextPageAndPrevPage = function (test) {
 
   var client = new Client(realConfig);
 
-  client.vehicles(function (res) {
+  client.vehicleTrips(realConfig.vehicleIdWithTripData, function (res) {
 
-    // This sucks but it's the best way to have a chance at having a vehicle with real trip data
-    var vehicle = res.body.vehicle[0];
+    test.strictEqual(1, res.body.trip.length);
+    test.ok(!_.contains(_.map(res.body.actions, function (action) { return action.name; }), 'previous'));
 
-    client.vehicleTrips(vehicle.deviceId, function (res2) {
+    client.nextPage(res, function (res2) {
+
+      var actions = _.map(res2.body.actions, function (action) { return action.name; });
 
       test.strictEqual(1, res2.body.trip.length);
-      test.ok(!_.contains(_.map(res2.body.actions, function (action) { return action.name; }), 'previous'));
+      test.ok(_.contains(actions, 'previous'));
+      test.ok(_.contains(actions, 'next'));
 
-      client.nextPage(res2, function (res3) {
+      client.prevPage(res2, function (res4) {
 
-        var actions = _.map(res3.body.actions, function (action) { return action.name; });
+        test.ok(!_.contains(_.map(res4.body.actions, function (action) { return action.name; }), 'previous'));
 
-        test.strictEqual(1, res3.body.trip.length);
-        test.ok(_.contains(actions, 'previous'));
-        test.ok(_.contains(actions, 'next'));
-
-        client.prevPage(res3, function (res4) {
-
-          test.ok(!_.contains(_.map(res4.body.actions, function (action) { return action.name; }), 'previous'));
-
-          // Obligatory nodeunit completion signal
-          test.done();
-
-        });
+        // Obligatory nodeunit completion signal
+        test.done();
 
       });
 
-    }, {
-      searchLimit: 1
     });
 
+  }, {
+    searchLimit: 1
   });
 
 };
@@ -485,27 +471,25 @@ exports.testTripDetails = function (test) {
 
   var client = new Client(realConfig);
 
-  client.vehicles(function (res) {
+  client.vehicleTrips(realConfig.vehicleIdWithTripData, function (res) {
 
-    var vehicle = res.body.vehicle[0];
+    var trip = res.body.trip[0];
 
-    client.vehicleTrips(vehicle.deviceId, function (res2) {
+    client.tripDetails(realConfig.vehicleIdWithTripData, trip.id, function (res2) {
 
-      var trip = res2.body.trip[0];
+      test.strictEqual(trip.id, res2.body.trip.id);
 
-      client.tripDetails(vehicle.deviceId, trip.id, function (res3) {
+      // Obligatory nodeunit completion signal
+      test.done();
 
-        test.strictEqual(trip.id, res3.body.trip.id);
-
-        // Obligatory nodeunit completion signal
-        test.done();
-
-      });
-
-    }, {
-      searchLimit: 1
     });
 
+  }, {
+    searchLimit: 1
   });
 
 };
+
+// TODO: client.constraintDetails and client.vehicleConstraints are untested
+//       The reason for this is there is no API to create constraints and the list constraints API returns a 404
+//       instead of a 200 with an empty array when there are no constraints for a vehicle.
