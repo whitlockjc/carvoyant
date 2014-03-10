@@ -1,8 +1,10 @@
 /**
- * Tests for lib/utils.
+ * Tests for lib/client.js.
  *
- * NOTE: These tests are live tests and as such can be somewhat brittle.  With there being no APIs for putting data
- *       into the Carvoyant API, there is no other way to do this without mocking.
+ * NOTE: These tests are live tests and as such can be somewhat brittle.  Some of the APIs we use to write new data to
+ *       Carvoyant do not have equivalent delete APIs so we cannot cleanup what we create.  This being said, try to use
+ *       a set of Carvoyant credentials that you can fill with test data without concern.  You should be able to clean
+ *       up your vehicle list from the Carvoyant Dashboard.
  */
 
 'use strict';
@@ -10,14 +12,17 @@
 var _ = {
     contains: require('lodash.contains'),
     each: require('lodash.foreach'),
+    find: require('lodash.find'),
     isArray: require('lodash.isarray'),
+    isNumber: require('lodash.isnumber'),
     isObject: require('lodash.isobject'),
     isUndefined: require('lodash.isundefined'),
     map: require('lodash.map')
   }
   , Carvoyant = require('..')
   , realConfig = require('./client_config')
-  , Client = Carvoyant.Client;
+  , Client = Carvoyant.Client
+  , createdVehicle; // This will be created once to avoid unnecessary cleanup
 
 /**
  * Test that an empty {@link Client} constructor throws an error.
@@ -117,6 +122,75 @@ exports.testNewClientWithCustomApiUrl = function (test) {
 };
 
 /**
+ * Test {@link Client#createVehicle} works as expected.
+ *
+ * Note: This test *must* run successfully for the remaining tests to run
+ */
+exports.testCreateVehicle = function (test) {
+
+  var client = new Client(realConfig)
+    , timestamp = new Date().getTime();
+
+  try {
+    client.createVehicle();
+  } catch (err) {
+    test.ok(err instanceof TypeError);
+    test.strictEqual('vehicleData must be defined.', err.message);
+  }
+
+  client.createVehicle({
+    label: 'Test Vehicle ' + timestamp,
+    mileage: 1
+  }, function (res) {
+
+    test.strictEqual(200, res.status);
+    createdVehicle = res.body.vehicle;
+
+    // Obligatory nodeunit completion signal
+    test.done();
+
+  });
+
+};
+
+/**
+ * Test {@link Client#updateVehicle} works as expected.
+ */
+exports.testUpdateVehicle = function (test) {
+
+  var client = new Client(realConfig);
+
+  try {
+    client.updateVehicle();
+  } catch (err) {
+    test.ok(err instanceof TypeError);
+    test.strictEqual('vehicleData must be defined.', err.message);
+  }
+
+  try {
+    client.updateVehicle({label: 'Testing'});
+  } catch (err) {
+    test.ok(err instanceof TypeError);
+    test.strictEqual('vehicleData.vehicleId must be defined.', err.message);
+  }
+
+  createdVehicle.mileage += 1;
+
+  client.updateVehicle(createdVehicle, function (res) {
+
+    test.strictEqual(200, res.status);
+    test.strictEqual(createdVehicle.mileage, res.body.vehicle.mileage);
+
+    createdVehicle = res.body.vehicle;
+
+    // Obligatory nodeunit completion signal
+    test.done();
+
+  });
+
+};
+
+/**
  * Test {@link Client#vehicles} works as expected.
  */
 exports.testListVehicles = function (test) {
@@ -127,7 +201,13 @@ exports.testListVehicles = function (test) {
 
     test.strictEqual(200, res.status);
     test.ok(_.isArray(res.body.vehicle));
-    test.ok(res.body.vehicle.length > 0);
+
+    // Make sure we found our created vehicle
+    test.ok(!_.isUndefined(_.find(res.body.vehicle, function (vehicle) {
+
+      return vehicle.label === createdVehicle.label;
+
+    })));
 
     // Obligatory nodeunit completion signal
     test.done();
@@ -143,20 +223,14 @@ exports.testGetVehicleById = function (test) {
 
   var client = new Client(realConfig);
 
-  client.vehicles(function (res) {
+  client.vehicle(createdVehicle.vehicleId, function (res) {
 
-    var vehicle = res.body.vehicle[0];
+    test.strictEqual(200, res.status);
+    test.ok(_.isObject(res.body.vehicle));
+    test.strictEqual(createdVehicle.label, res.body.vehicle.label);
 
-    client.vehicle(vehicle.deviceId, function (res2) {
-
-      test.strictEqual(200, res2.status);
-      test.ok(_.isObject(res2.body.vehicle));
-      test.strictEqual(vehicle.name, res2.body.vehicle.name);
-
-      // Obligatory nodeunit completion signal
-      test.done();
-
-    });
+    // Obligatory nodeunit completion signal
+    test.done();
 
   });
 
@@ -213,39 +287,15 @@ exports.testListTrips = function (test) {
 
   var client = new Client(realConfig);
 
-  client.vehicles(function (res) {
+  client.vehicleTrips(createdVehicle.vehicleId, function (res) {
 
-    var vehicle = res.body.vehicle[0]
-      , defaultPageSize = 20;
+    test.strictEqual(200, res.status);
+    test.ok(_.isArray(res.body.trip));
+    test.ok(_.isNumber(res.body.totalRecords));
+    test.ok(_.isArray(res.body.actions));
 
-    client.vehicleTrips(vehicle.deviceId, function (res2) {
-
-      test.strictEqual(200, res2.status);
-      test.ok(_.isArray(res2.body.trip));
-      test.strictEqual(defaultPageSize, res2.body.trip.length);
-      test.ok(_.isArray(res2.body.actions));
-
-      if (res2.body.totalRecords > defaultPageSize) {
-        test.strictEqual('next', res2.body.actions[0].name);
-
-        client.vehicleTrips(vehicle.deviceId, function (res3) {
-
-          test.notStrictEqual(res2.body.trip[0].id, res3.body.trip[0].id);
-
-          client.nextPage(res3);
-
-          // Obligatory nodeunit completion signal
-          test.done();
-
-        }, {
-          searchOffset: defaultPageSize + 1
-        });
-      } else {
-        // Obligatory nodeunit completion signal
-        test.done();
-      }
-
-    });
+    // Obligatory nodeunit completion signal
+    test.done();
 
   });
 
@@ -304,6 +354,7 @@ exports.testNextPageAndPrevPage = function (test) {
 
   client.vehicles(function (res) {
 
+    // This sucks but it's the best way to have a chance at having a vehicle with real trip data
     var vehicle = res.body.vehicle[0];
 
     client.vehicleTrips(vehicle.deviceId, function (res2) {
