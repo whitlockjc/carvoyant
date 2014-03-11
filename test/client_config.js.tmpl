@@ -4,11 +4,10 @@ module.exports = {
   // Your Carvoyant API Security Token
   securityToken: '...',
   // This is the vehicle id that has real trip data for the trip API tests. (read-only)
-  // The reason for this is there is no way to test the trip APIs or pagination without real data due to there being
-  // no live APIs for creating trip data.
+  // The reason for this is there is no way to test the trip details API without live data and we use trip data to
+  // test pagination and since there is no API to create trip data programmatically, we need a live id.
   vehicleIdWithTripData: '...',
   // This is the vehicle id that has real constraints for the constraints API tests. (read-only)
-  // The reason for this is there is no way to test the constraint APIs without real data due to there being no live
-  // APIs for creating constraints.
+  // The reason for this is there is no way to test the constraints APIs without live data.
   vehicleIdWithConstraints: '...'
 };

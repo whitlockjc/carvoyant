@@ -340,50 +340,6 @@ exports.testMakeRequestInvalidArgument = function (test) {
 };
 
 /**
- * Test that calls to {@link Client#nextPage} and {@link Client#prevPage} work as expected.
- *
- * Note: Skipped if your client_config.js is missing the vehicleIdWithTripData option.
- */
-exports.testNextPageAndPrevPage = function (test) {
-
-  var client = new Client(realConfig);
-
-  if (realConfig.vehicleIdWithTripData) {
-    client.vehicleTrips(realConfig.vehicleIdWithTripData, function (res) {
-
-      test.strictEqual(1, res.body.trip.length);
-      test.ok(!_.contains(_.map(res.body.actions, function (action) { return action.name; }), 'previous'));
-
-      client.nextPage(res, function (res2) {
-
-        var actions = _.map(res2.body.actions, function (action) { return action.name; });
-
-        test.strictEqual(1, res2.body.trip.length);
-        test.ok(_.contains(actions, 'previous'));
-        test.ok(_.contains(actions, 'next'));
-
-        client.prevPage(res2, function (res4) {
-
-          test.ok(!_.contains(_.map(res4.body.actions, function (action) { return action.name; }), 'previous'));
-
-          // Obligatory nodeunit completion signal
-          test.done();
-
-        });
-
-      });
-
-    }, {
-      searchLimit: 1
-    });
-  } else {
-    // Obligatory nodeunit completion signal
-    test.done();
-  }
-
-};
-
-/**
  * Test that invalid values passed to {@link Client#vehicleData} throw the proper error.
  */
 exports.testVehicleDataInvalidArgument = function (test) {
@@ -471,6 +427,8 @@ exports.testVehicleDataSet = function (test) {
   });
 
 };
+
+/** All tests below this point have parts that are skipped if the required configuration is missing. **/
 
 /**
  * Test that calls to {@link Client#tripDetails} work as expected.
@@ -584,6 +542,50 @@ exports.testConstraintDetails = function (test) {
 
       });
 
+    });
+  } else {
+    // Obligatory nodeunit completion signal
+    test.done();
+  }
+
+};
+
+/**
+ * Test that calls to {@link Client#nextPage} and {@link Client#prevPage} work as expected.
+ *
+ * Note: Skipped if your client_config.js is missing the vehicleIdWithTripData option.
+ */
+exports.testNextPageAndPrevPage = function (test) {
+
+  var client = new Client(realConfig);
+
+  if (realConfig.vehicleIdWithTripData) {
+    client.vehicleTrips(realConfig.vehicleIdWithTripData, function (res) {
+
+      test.strictEqual(1, res.body.trip.length);
+      test.ok(!_.contains(_.map(res.body.actions, function (action) { return action.name; }), 'previous'));
+
+      client.nextPage(res, function (res2) {
+
+        var actions = _.map(res2.body.actions, function (action) { return action.name; });
+
+        test.strictEqual(1, res2.body.trip.length);
+        test.ok(_.contains(actions, 'previous'));
+        test.ok(_.contains(actions, 'next'));
+
+        client.prevPage(res2, function (res4) {
+
+          test.ok(!_.contains(_.map(res4.body.actions, function (action) { return action.name; }), 'previous'));
+
+          // Obligatory nodeunit completion signal
+          test.done();
+
+        });
+
+      });
+
+    }, {
+      searchLimit: 1
     });
   } else {
     // Obligatory nodeunit completion signal
