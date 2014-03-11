@@ -476,7 +476,7 @@ exports.testVehicleDataSet = function (test) {
  *
  * Note: This must succeed for further event subscription tests to pass.
  */
-exports.createEventSubscription = function (test) {
+exports.testCreateEventSubscription = function (test) {
 
   var client = new Client(realConfig);
 
@@ -491,7 +491,7 @@ exports.createEventSubscription = function (test) {
     client.createEventSubscription(createdVehicle.vehicleId);
   } catch (err) {
     test.ok(err instanceof TypeError);
-    test.strictEqual('eventSubscriptionType must be defined.', err.message);
+    test.strictEqual('eventType must be defined.', err.message);
   }
 
   try {
@@ -518,9 +518,9 @@ exports.createEventSubscription = function (test) {
 };
 
 /**
- * Test that calls to {@link Client#eventSubscriptions} works as expected when there is no event subscription type.
+ * Test that calls to {@link Client#eventSubscriptions} works as expected when there is no event type.
  */
-exports.eventSubscriptionsWithoutType = function (test) {
+exports.testEventSubscriptionsWithoutType = function (test) {
 
   var client = new Client(realConfig);
 
@@ -545,9 +545,62 @@ exports.eventSubscriptionsWithoutType = function (test) {
 };
 
 /**
- * Test that calls to {@link Client#eventSubscriptions} works as expected when there is an event subscription type.
+ * Test that calls to {@link Client#eventSubscriptions} works as expected when there is no event type.
  */
-exports.eventSubscriptionsWithType = function (test) {
+exports.testEventSubscriptionsWithType = function (test) {
+
+  var client = new Client(realConfig);
+
+  client.eventSubscriptions(createdVehicle.vehicleId, function (res) {
+
+    test.strictEqual(200, res.status);
+
+    test.ok(_.isArray(res.body.subscriptions));
+
+    // Obligatory nodeunit completion signal
+    test.done();
+
+  }, Carvoyant.Utilities.externalizeEventType(createdEventSubscription._type));
+
+};
+
+/**
+ * Test that calls to {@link Client#eventSubscriptionDetails} works as expected when there is no event type.
+ */
+exports.testEventSubscriptionDetailsWithoutType = function (test) {
+
+  var client = new Client(realConfig);
+
+  try {
+    client.eventSubscriptionDetails();
+  } catch (err) {
+    test.ok(err instanceof TypeError);
+    test.strictEqual('vehicleId must be defined.', err.message);
+  }
+
+  try {
+    client.eventSubscriptionDetails(createdVehicle.vehicleId);
+  } catch (err) {
+    test.ok(err instanceof TypeError);
+    test.strictEqual('eventSubscriptionId must be defined.', err.message);
+  }
+
+  client.eventSubscriptionDetails(createdVehicle.vehicleId, createdEventSubscription.id, function (res) {
+
+    test.strictEqual(200, res.status);
+    test.strictEqual(createdEventSubscription.id, res.body.subscription.id);
+
+    // Obligatory nodeunit completion signal
+    test.done();
+
+  });
+
+};
+
+/**
+ * Test that calls to {@link Client#eventSubscriptionDetails} works as expected when there is an event type.
+ */
+exports.testEventSubscriptionDetailsWithType = function (test) {
 
   var client = new Client(realConfig);
 
@@ -559,13 +612,12 @@ exports.eventSubscriptionsWithType = function (test) {
     // Obligatory nodeunit completion signal
     test.done();
 
-  }, Carvoyant.Utilities.externalizeEventSubscriptionType(createdEventSubscription._type));
+  }, Carvoyant.Utilities.externalizeEventType(createdEventSubscription._type));
 
 };
 
 /**
- * Test that calls to {@link Client#updateEventSubscription} works as expected when there is no event subscription
- * type.
+ * Test that calls to {@link Client#updateEventSubscription} works as expected when there is an event type.
  */
 exports.updateEventSubscriptionWithoutType = function (test) {
 
@@ -602,8 +654,7 @@ exports.updateEventSubscriptionWithoutType = function (test) {
 };
 
 /**
- * Test that calls to {@link Client#updateEventSubscription} works as expected when there is an event subscription
- * type.
+ * Test that calls to {@link Client#updateEventSubscription} works as expected when there is an event type.
  */
 exports.updateEventSubscriptionWithType = function (test) {
 
@@ -621,13 +672,12 @@ exports.updateEventSubscriptionWithType = function (test) {
     // Obligatory nodeunit completion signal
     test.done();
 
-  }, Carvoyant.Utilities.externalizeEventSubscriptionType(createdEventSubscription._type));
+  }, Carvoyant.Utilities.externalizeEventType(createdEventSubscription._type));
 
 };
 
 /**
- * Test that calls to {@link Client#deleteEventSubscription} works as expected when there is no event subscription
- * type.
+ * Test that calls to {@link Client#deleteEventSubscription} works as expected when there is no event type.
  */
 exports.deleteEventSubscriptionWithoutType = function (test) {
 
@@ -668,13 +718,12 @@ exports.deleteEventSubscriptionWithoutType = function (test) {
 };
 
 /**
- * Test that calls to {@link Client#deleteEventSubscription} works as expected when there is an event subscription
- * type.
+ * Test that calls to {@link Client#deleteEventSubscription} works as expected when there is an event type.
  */
 exports.deleteEventSubscriptionWithType = function (test) {
 
   var client = new Client(realConfig)
-    , eventSubscriptionType = Carvoyant.Utilities.externalizeEventSubscriptionType(createdEventSubscription._type);
+    , eventType = Carvoyant.Utilities.externalizeEventType(createdEventSubscription._type);
 
   client.deleteEventSubscription(createdVehicle.vehicleId, createdEventSubscription.id, function (res) {
 
@@ -683,7 +732,7 @@ exports.deleteEventSubscriptionWithType = function (test) {
     // Obligatory nodeunit completion signal
     test.done();
 
-  }, eventSubscriptionType);
+  }, eventType);
 
 };
 
@@ -845,6 +894,156 @@ exports.testNextPageAndPrevPage = function (test) {
 
     }, {
       searchLimit: 1
+    });
+  } else {
+    // Obligatory nodeunit completion signal
+    test.done();
+  }
+
+};
+
+/**
+ * Test that calls to {@link Client#eventNotifications} works as expected when there is no event type.
+ *
+ * Note: Skipped if your client_config.js is missing the vehicleIdWithNotifications option.
+ */
+exports.testEventNotificationsWithoutType = function (test) {
+
+  var client = new Client(realConfig);
+
+  try {
+    client.eventNotifications();
+  } catch (err) {
+    test.ok(err instanceof TypeError);
+    test.strictEqual('vehicleId must be defined.', err.message);
+  }
+
+  if (realConfig.vehicleIdWithNotifications) {
+    client.eventNotifications(createdVehicle.vehicleId, function (res) {
+
+      test.strictEqual(200, res.status);
+
+      test.ok(_.isArray(res.body.notification));
+
+      // Obligatory nodeunit completion signal
+      test.done();
+
+    });
+  } else {
+    // Obligatory nodeunit completion signal
+    test.done();
+  }
+
+};
+
+/**
+ * Test that calls to {@link Client#eventNotifications} works as expected when there is no event type.
+ *
+ * Note: Skipped if your client_config.js is missing the vehicleIdWithNotifications option.
+ */
+exports.testEventNotificationsWithType = function (test) {
+
+  var client = new Client(realConfig);
+
+  if (realConfig.vehicleIdWithNotifications) {
+    // Since we cannot create notifications, get the first one in the list
+
+    client.eventNotifications(createdVehicle.vehicleId, function (res) {
+
+      client.eventNotifications(createdVehicle.vehicleId, function (res2) {
+
+        test.strictEqual(200, res2.status);
+
+        test.ok(_.isArray(res2.body.notifications));
+
+        // Obligatory nodeunit completion signal
+        test.done();
+
+      }, Carvoyant.Utilities.externalizeEventType(res.body.notifications[0]._type));
+
+    });
+  } else {
+    // Obligatory nodeunit completion signal
+    test.done();
+  }
+
+};
+
+/**
+ * Test that calls to {@link Client#eventNotificationDetails} works as expected when there is no event type.
+ *
+ * Note: Skipped if your client_config.js is missing the vehicleIdWithNotifications option.
+ */
+exports.testEventNotificationDetailsWithoutType = function (test) {
+
+  var client = new Client(realConfig);
+
+  try {
+    client.eventNotificationDetails();
+  } catch (err) {
+    test.ok(err instanceof TypeError);
+    test.strictEqual('vehicleId must be defined.', err.message);
+  }
+
+  try {
+    client.eventNotificationDetails(createdVehicle.vehicleId);
+  } catch (err) {
+    test.ok(err instanceof TypeError);
+    test.strictEqual('eventNotificationId must be defined.', err.message);
+  }
+
+  if (realConfig.vehicleIdWithNotifications) {
+    client.eventNotifications(createdVehicle.vehicleId, function (res) {
+
+      client.eventNotificationDetails(createdVehicle.vehicleId, res.body.notifications[0].id, function (res2) {
+
+        test.strictEqual(200, res2.status);
+        test.strictEqual(res.body.notifications[0].id, res2.body.notification.id);
+
+        // Obligatory nodeunit completion signal
+        test.done();
+
+      });
+
+    });
+  } else {
+    // Obligatory nodeunit completion signal
+    test.done();
+  }
+
+};
+
+/**
+ * Test that calls to {@link Client#eventNotificationDetails} works as expected when there is an event type.
+ *
+ * Note: Skipped if your client_config.js is missing the vehicleIdWithNotifications option.
+ */
+exports.testEventNotificationDetailsWithType = function (test) {
+
+  var client = new Client(realConfig);
+
+  try {
+    client.eventNotificationDetails(createdVehicle.vehicleId);
+  } catch (err) {
+    test.ok(err instanceof TypeError);
+    test.strictEqual('eventNotificationId must be defined.', err.message);
+  }
+
+  if (realConfig.vehicleIdWithNotifications) {
+    client.eventNotifications(createdVehicle.vehicleId, function (res) {
+
+      var notification = res.body.notifications[0];
+
+      client.eventNotificationDetails(createdVehicle.vehicleId, notification.id, function (res2) {
+
+        test.strictEqual(200, res2.status);
+        test.strictEqual(notification.id, res2.body.notification.id);
+
+        // Obligatory nodeunit completion signal
+        test.done();
+
+      }, Carvoyant.Utilities.externalizeEventType(notification._type));
+
     });
   } else {
     // Obligatory nodeunit completion signal
