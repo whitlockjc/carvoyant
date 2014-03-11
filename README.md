@@ -14,7 +14,7 @@ this library has complete feature parity with the documented Carvoyant API Refer
     * [Constraint APIs][carvoyant-constraint-apis]
     * [Event Notification APIs][carvoyant-event-notification-apis]
     * [Event Subscription APIs][carvoyant-event-subscription-apis]
-    * [Create/Upcate Vehicle APIs][carvoyant-vehicle-apis]
+    * [Create/Update Vehicle APIs][carvoyant-vehicle-apis]
 * **0.0.3 (2014 Mar 8)** - Bugfix release
     * [Pull Request #1 (Use query params or POST body based on API)][pr1]
 * **0.0.2 (2013 Nov 26)** - Miscellaneous minor refactorings
