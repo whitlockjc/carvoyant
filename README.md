@@ -99,14 +99,30 @@ instead of using the whole library to make the browser builds as small as possib
 
 Right now the default Grunt command will run all tests (browser and Node.js) and create browser binaries for the
 project.  To do this, all you have to do is run `grunt` from the command line, this of course assumes you installed
-the project dependencies after cloning the repository using `npm install`.  You can also generate
-[JSDoc](http://usejsdoc.org/) documentation using `grunt jsdoc`.  (This will eventually be incorporated into the
-build/release cycle so we can host the API documentation online.)  Finally, to run the test suite you need to copy
-the template client configuration from **test/client_config.js.tmpl** to **test/client_config.js** and populate it
-with valid Carvoyant API credentials.
+the project dependencies after cloning the repository using `npm install` and that you've created a working
+`test/client_config.js`.  (You can do this by copying `test/client_config.js.tmpl` to `test/client_config.js` and
+updating accordingly)  As of this time, unit tests and integration tests run together, there is no separation.  Do
+to the nature of the upstream Carvoyant API, this can leave behind created vehicles.  You can clean these up from
+the [Carvoyant Dashboard][carvoyant-dashboard].
+
+**Disclaimer**
+The way tests currently work right now is we create a vehicle and that vehicle is used for **all** tests where
+possible.  Any write API we test will be against the created vehicle.  We will never update an object we did not
+create as a part of our test.  When you are done, the created vehicle will be left in your inventory due to a missing
+delete API.
+
+There are a few tests that require us to use a vehicle id that already has data associated with it, due to us not
+having APIs to create the data behind the APIs being tested.  These cases are documented and handled in the
+`test/client_config.js`.
+
+### API Documentation
+
+You can also generate [JSDoc](http://usejsdoc.org/) documentation using `grunt jsdoc`.  (This will eventually be
+incorporated into the build/release cycle so we can host the API documentation online.)
 
 [carvoyant-account-apis]: http://confluence.carvoyant.com/display/PUBDEV/Account
 [carvoyant-constraint-apis]: http://confluence.carvoyant.com/display/PUBDEV/Constraint
+[carvoyant-dashboard]: https://dash.carvoyant.com/
 [carvoyant-event-notification-apis]: http://confluence.carvoyant.com/display/PUBDEV/EventNotification
 [carvoyant-event-subscription-apis]: http://confluence.carvoyant.com/display/PUBDEV/EventSubscription
 [carvoyant-vehicle-apis]: http://confluence.carvoyant.com/display/PUBDEV/Vehicle
