@@ -6,7 +6,12 @@ this library has complete feature parity with the documented Carvoyant API Refer
 
 ## Release Notes
 
-* **0.0.4 (TBD)** - Add missing Carvoyant APIs
+* **0.0.4 (2014 Mar 11)** - Add support for missing Carvoyant APIs
+    * [Account APIs][carvoyant-account-apis]
+    * [Constraint APIs][carvoyant-constraint-apis]
+    * [Event Notification APIs][carvoyant-event-notification-apis]
+    * [Event Subscription APIs][carvoyant-event-subscription-apis]
+    * [Create/Upcate Vehicle APIs][carvoyant-vehicle-apis]
 * **0.0.3 (2014 Mar 8)** - Build including [Pull Request #1 (Use query params or POST body based on API)][pr1]
 * **0.0.2 (2013 Nov 26)** - Miscellaneous minor refactorings
 * **0.0.1 (2013 Nov 19)** - Initial release
@@ -83,4 +88,9 @@ build/release cycle so we can host the API documentation online.)  Finally, to r
 the template client configuration from **test/client_config.js.tmpl** to **test/client_config.js** and populate it
 with valid Carvoyant API credentials.
 
+[carvoyant-account-apis]: http://confluence.carvoyant.com/display/PUBDEV/Account
+[carvoyant-constraint-apis]: http://confluence.carvoyant.com/display/PUBDEV/Constraint
+[carvoyant-event-notification-apis]: http://confluence.carvoyant.com/display/PUBDEV/EventNotification
+[carvoyant-event-subscription-apis]: http://confluence.carvoyant.com/display/PUBDEV/EventSubscription
+[carvoyant-vehicle-apis]: http://confluence.carvoyant.com/display/PUBDEV/Vehicle
 [pr1]: https://github.com/whitlockjc/carvoyant/pull/1

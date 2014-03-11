@@ -194,3 +194,28 @@ exports.testTimestampToDate = function (test) {
   test.done();
 
 };
+
+/**
+ * Test that {@link module:carvoyant/utils#externalizeEventType} works as expected.
+ */
+exports.testExternalizeEventType = function (test) {
+
+  var valueMap = {
+    GEOFENCE: 'geoFence',
+    LOWBATTERY: 'lowBattery',
+    NUMERICDATAKEY: 'numericDataKey',
+    TIMEOFDAY: 'timeOfDay',
+    TROUBLECODE: 'troubleCode',
+    UNKNOWN: 'UNKNOWN'
+  };
+
+  _.each(valueMap, function (value, key) {
+
+    test.strictEqual(value, utils.externalizeEventType(key));
+
+  });
+
+  // Obligatory nodeunit completion signal
+  test.done();
+
+};
