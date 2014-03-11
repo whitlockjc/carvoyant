@@ -21,14 +21,16 @@ this library has complete feature parity with the documented Carvoyant API Refer
 
 ## Known API Issues
 
-Below are a list of known (as of this writing) Carvoyant API shortcomings/inconsistencies:
+Below are a list of known (as of this writing) issues/inconsistencies with the upstream Carvoyant API:
 
-* No API for deleting a vehicle (Has an impact on testing)
+* No API for deleting a vehicle (Has an impact on testing and API completeness)
 * No API to create trip data (Makes sense but this has an impact on testing)
-* No API to create/update/delete constraints (Has an impact on testing)
-* Constraint, event notification, event subscription and vehicle list APIs return 404 instead of a 200 with empty array
-when there are no objects (This is just an inconsistency that might cause you issues in using the API without knowing)
-* Some list APIs return plural form (constraint, subscriptions, notifications) while the rest do not (This is just an
+* No API to create/update/delete constraints (Has an impact on testing and API completeness)
+* No API to create event notifications (Makes sense but has an impact on testing)
+* Constraint update API seems broken (Creates a new constraint instead of updating the existing one)
+* Constraint, event notification, event subscription and vehicle list APIs return 404 instead for an empty list instead
+of a 200 with empty array (This is just an inconsistency that might cause you issues in using the API without knowing)
+* Some list APIs return plural form (constraints, subscriptions, notifications) while the rest do not (This is just an
 inconsistency that might cause you issues in using the API without knowing)
 
 ## Usage
