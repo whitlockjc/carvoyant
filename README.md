@@ -6,6 +6,9 @@ this library has complete feature parity with the documented Carvoyant API Refer
 
 ## Release Notes
 
+* **0.0.5 (TBD)** - Cleanup the API
+    * Stop passing each API argument as a function argument (use `function (options, cb)`)
+    * Implement code coverage in the tests
 * **0.0.4 (2014 Mar 11)** - Add support for missing Carvoyant APIs
     * [Account APIs][carvoyant-account-apis]
     * [Constraint APIs][carvoyant-constraint-apis]
@@ -15,6 +18,18 @@ this library has complete feature parity with the documented Carvoyant API Refer
 * **0.0.3 (2014 Mar 8)** - Build including [Pull Request #1 (Use query params or POST body based on API)][pr1]
 * **0.0.2 (2013 Nov 26)** - Miscellaneous minor refactorings
 * **0.0.1 (2013 Nov 19)** - Initial release
+
+## Known API Issues
+
+Below are a list of known (as of this writing) Carvoyant API shortcomings/inconsistencies:
+
+* No API for deleting a vehicle (Has an impact on testing)
+* No API to create trip data (Makes sense but this has an impact on testing)
+* No API to create/update/delete constraints (Has an impact on testing)
+* Constraint, event notification, event subscription and vehicle list APIs return 404 instead of a 200 with empty array
+when there are no objects (This is just an inconsistency that might cause you issues in using the API without knowing)
+* Some list APIs return plural form (constraint, subscriptions, notifications) while the rest do not (This is just an
+inconsistency that might cause you issues in using the API without knowing)
 
 ## Usage
 
@@ -27,8 +42,8 @@ a zero configuration deployment, meaning you do not need to download/install thi
 library to work in a web browser.  While using this library will be no different than usual, there are two versions
 of the file:
 
-* [carvoyant.js](https://raw.github.com/whitlockjc/carvoyant/master/carvoyant.js): _284kb_, full source and source maps
-* [carvoyant.min.js](https://raw.github.com/whitlockjc/carvoyant/master/carvoyant.min.js): _32kb_, minified, compressed
+* [carvoyant.js](https://raw.github.com/whitlockjc/carvoyant/master/carvoyant.js): _328kb_, full source and source maps
+* [carvoyant.min.js](https://raw.github.com/whitlockjc/carvoyant/master/carvoyant.min.js): _40kb_, minified, compressed
 and no sourcemap
 
 Installation can be as simple as downloading the proper JavaScript file into your project or installing it via

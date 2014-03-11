@@ -619,7 +619,7 @@ exports.testEventSubscriptionDetailsWithType = function (test) {
 /**
  * Test that calls to {@link Client#updateEventSubscription} works as expected when there is an event type.
  */
-exports.updateEventSubscriptionWithoutType = function (test) {
+exports.testUpdateEventSubscriptionWithoutType = function (test) {
 
   var client = new Client(realConfig);
 
@@ -656,7 +656,7 @@ exports.updateEventSubscriptionWithoutType = function (test) {
 /**
  * Test that calls to {@link Client#updateEventSubscription} works as expected when there is an event type.
  */
-exports.updateEventSubscriptionWithType = function (test) {
+exports.testUpdateEventSubscriptionWithType = function (test) {
 
   var client = new Client(realConfig);
 
@@ -679,7 +679,7 @@ exports.updateEventSubscriptionWithType = function (test) {
 /**
  * Test that calls to {@link Client#deleteEventSubscription} works as expected when there is no event type.
  */
-exports.deleteEventSubscriptionWithoutType = function (test) {
+exports.testDeleteEventSubscriptionWithoutType = function (test) {
 
   var client = new Client(realConfig);
 
@@ -720,7 +720,7 @@ exports.deleteEventSubscriptionWithoutType = function (test) {
 /**
  * Test that calls to {@link Client#deleteEventSubscription} works as expected when there is an event type.
  */
-exports.deleteEventSubscriptionWithType = function (test) {
+exports.testDeleteEventSubscriptionWithType = function (test) {
 
   var client = new Client(realConfig)
     , eventType = Carvoyant.Utilities.externalizeEventType(createdEventSubscription._type);
