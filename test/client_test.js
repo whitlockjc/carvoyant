@@ -123,6 +123,48 @@ exports.testNewClientWithCustomApiUrl = function (test) {
 };
 
 /**
+ * Test {@link Client#accounts} works as expected.
+ */
+exports.testListAccounts = function (test) {
+
+  var client = new Client(realConfig);
+
+  client.accounts(function (res) {
+
+    test.strictEqual(200, res.status);
+    test.ok(_.isArray(res.body.account));
+
+    // Obligatory nodeunit completion signal
+    test.done();
+
+  });
+
+};
+
+/**
+ * Test {@link Client#accountDetails} works as expected.
+ */
+exports.testGetAccountDetails = function (test) {
+
+  var client = new Client(realConfig);
+
+  client.accounts(function (res) {
+
+    client.accountDetails(res.body.account[0].id, function (res2) {
+
+      test.strictEqual(200, res2.status);
+      test.ok(_.isObject(res2.body.account));
+
+      // Obligatory nodeunit completion signal
+      test.done();
+
+    });
+
+  });
+
+};
+
+/**
  * Test {@link Client#createVehicle} works as expected.
  *
  * Note: This test *must* run successfully for the remaining tests to run
