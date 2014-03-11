@@ -23,7 +23,8 @@ var _ = {
   , Carvoyant = require('..')
   , realConfig = require('./client_config')
   , Client = Carvoyant.Client
-  , createdVehicle; // This will be created once to avoid unnecessary cleanup
+  , createdVehicle // This will be created once to avoid unnecessary cleanup
+  , createdEventSubscription;
 
 /**
  * Test that an empty {@link Client} constructor throws an error.
@@ -467,6 +468,222 @@ exports.testVehicleDataSet = function (test) {
     test.done();
 
   });
+
+};
+
+/**
+ * Test that calls to {@link Client#createEventSubscription} works as expected.
+ *
+ * Note: This must succeed for further event subscription tests to pass.
+ */
+exports.createEventSubscription = function (test) {
+
+  var client = new Client(realConfig);
+
+  try {
+    client.createEventSubscription();
+  } catch (err) {
+    test.ok(err instanceof TypeError);
+    test.strictEqual('vehicleId must be defined.', err.message);
+  }
+
+  try {
+    client.createEventSubscription(createdVehicle.vehicleId);
+  } catch (err) {
+    test.ok(err instanceof TypeError);
+    test.strictEqual('eventSubscriptionType must be defined.', err.message);
+  }
+
+  try {
+    client.createEventSubscription(createdVehicle.vehicleId, 'lowBattery');
+  } catch (err) {
+    test.ok(err instanceof TypeError);
+    test.strictEqual('eventSubscription must be defined.', err.message);
+  }
+
+  client.createEventSubscription(createdVehicle.vehicleId, 'lowBattery', {
+    minimumTime: 20,
+    postUrl: 'https://consumer.org/receive'
+  }, function (res) {
+
+    test.strictEqual(200, res.status);
+    test.strictEqual('https://consumer.org/receive',  res.body.subscription.postUrl);
+
+    createdEventSubscription = res.body.subscription;
+
+    // Obligatory nodeunit completion signal
+    test.done();
+
+  });
+};
+
+/**
+ * Test that calls to {@link Client#eventSubscriptions} works as expected when there is no event subscription type.
+ */
+exports.eventSubscriptionsWithoutType = function (test) {
+
+  var client = new Client(realConfig);
+
+  try {
+    client.eventSubscriptions();
+  } catch (err) {
+    test.ok(err instanceof TypeError);
+    test.strictEqual('vehicleId must be defined.', err.message);
+  }
+
+  client.eventSubscriptions(createdVehicle.vehicleId, function (res) {
+
+    test.strictEqual(200, res.status);
+
+    test.ok(_.isArray(res.body.subscriptions));
+
+    // Obligatory nodeunit completion signal
+    test.done();
+
+  });
+
+};
+
+/**
+ * Test that calls to {@link Client#eventSubscriptions} works as expected when there is an event subscription type.
+ */
+exports.eventSubscriptionsWithType = function (test) {
+
+  var client = new Client(realConfig);
+
+  client.eventSubscriptionDetails(createdVehicle.vehicleId, createdEventSubscription.id, function (res) {
+
+    test.strictEqual(200, res.status);
+    test.strictEqual(createdEventSubscription.id, res.body.subscription.id);
+
+    // Obligatory nodeunit completion signal
+    test.done();
+
+  }, Carvoyant.Utilities.externalizeEventSubscriptionType(createdEventSubscription._type));
+
+};
+
+/**
+ * Test that calls to {@link Client#updateEventSubscription} works as expected when there is no event subscription
+ * type.
+ */
+exports.updateEventSubscriptionWithoutType = function (test) {
+
+  var client = new Client(realConfig);
+
+  try {
+    client.updateEventSubscription();
+  } catch (err) {
+    test.ok(err instanceof TypeError);
+    test.strictEqual('vehicleId must be defined.', err.message);
+  }
+
+  try {
+    client.updateEventSubscription(createdVehicle.vehicleId);
+  } catch (err) {
+    test.ok(err instanceof TypeError);
+    test.strictEqual('eventSubscription must be defined.', err.message);
+  }
+
+  createdEventSubscription.minimumTime += 1;
+
+  client.updateEventSubscription(createdVehicle.vehicleId, createdEventSubscription, function (res) {
+
+    test.strictEqual(200, res.status);
+    test.strictEqual(createdEventSubscription.minimumTime, res.body.subscription.minimumTime);
+
+    createdEventSubscription = res.body.subscription;
+
+    // Obligatory nodeunit completion signal
+    test.done();
+
+  });
+
+};
+
+/**
+ * Test that calls to {@link Client#updateEventSubscription} works as expected when there is an event subscription
+ * type.
+ */
+exports.updateEventSubscriptionWithType = function (test) {
+
+  var client = new Client(realConfig);
+
+  createdEventSubscription.minimumTime += 1;
+
+  client.updateEventSubscription(createdVehicle.vehicleId, createdEventSubscription, function (res) {
+
+    test.strictEqual(200, res.status);
+    test.strictEqual(createdEventSubscription.minimumTime, res.body.subscription.minimumTime);
+
+    createdEventSubscription = res.body.subscription;
+
+    // Obligatory nodeunit completion signal
+    test.done();
+
+  }, Carvoyant.Utilities.externalizeEventSubscriptionType(createdEventSubscription._type));
+
+};
+
+/**
+ * Test that calls to {@link Client#deleteEventSubscription} works as expected when there is no event subscription
+ * type.
+ */
+exports.deleteEventSubscriptionWithoutType = function (test) {
+
+  var client = new Client(realConfig);
+
+  try {
+    client.deleteEventSubscription();
+  } catch (err) {
+    test.ok(err instanceof TypeError);
+    test.strictEqual('vehicleId must be defined.', err.message);
+  }
+
+  try {
+    client.deleteEventSubscription(createdVehicle.vehicleId);
+  } catch (err) {
+    test.ok(err instanceof TypeError);
+    test.strictEqual('eventSubscriptionId must be defined.', err.message);
+  }
+
+  client.createEventSubscription(createdVehicle.vehicleId, 'troubleCode', {
+    minimumTime: 20,
+    postUrl: 'https://consumer.org/receive'
+  }, function (res) {
+
+    var subscription = res.body.subscription;
+
+    client.deleteEventSubscription(createdVehicle.vehicleId, subscription.id, function (res2) {
+
+      test.strictEqual(200, res2.status);
+
+      // Obligatory nodeunit completion signal
+      test.done();
+
+    });
+
+  });
+
+};
+
+/**
+ * Test that calls to {@link Client#deleteEventSubscription} works as expected when there is an event subscription
+ * type.
+ */
+exports.deleteEventSubscriptionWithType = function (test) {
+
+  var client = new Client(realConfig)
+    , eventSubscriptionType = Carvoyant.Utilities.externalizeEventSubscriptionType(createdEventSubscription._type);
+
+  client.deleteEventSubscription(createdVehicle.vehicleId, createdEventSubscription.id, function (res) {
+
+    test.strictEqual(200, res.status);
+
+    // Obligatory nodeunit completion signal
+    test.done();
+
+  }, eventSubscriptionType);
 
 };
 
