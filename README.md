@@ -8,6 +8,7 @@ this library has complete feature parity with the documented Carvoyant API Refer
 
 * **0.0.5 (TBD)** - Cleanup the API
     * Stop passing each API argument as a function argument (use `function (options, cb)`)
+    * Refactor out of single client.js into more specific modules
     * Implement code coverage in the tests
 * **0.0.4 (2014 Mar 11)** - Add support for missing Carvoyant APIs
     * [Account APIs][carvoyant-account-apis]
