@@ -7,6 +7,7 @@ this library has complete feature parity with the documented Carvoyant API Refer
 ## Release Notes
 
 * **0.0.5 (TBD)** - Cleanup the API
+    * Go to event-based model for all APIs to get away from callback hell
     * Stop passing each API argument as a function argument (use `function (options, cb)`)
     * Refactor out of single client.js into more specific modules
     * Implement code coverage in the tests
