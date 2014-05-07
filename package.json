@@ -1,7 +1,7 @@
 {
   "name": "carvoyant",
   "description": "The Carvoyant API client library.",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "author": {
     "name": "Jeremy Whitlock",
     "email": "jwhitlock@apache.org"
