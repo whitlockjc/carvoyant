@@ -11,7 +11,7 @@ this library has complete feature parity with the documented Carvoyant API Refer
     * Stop passing each API argument as a function argument (use `function (options, cb)`)
     * Refactor out of single client.js into more specific modules
     * Implement code coverage in the tests
-* **0.0.5 (2014 May 7)** - Added support for OAuth authentication/authorization
+* **0.0.5 (2014 May 6)** - Added support for OAuth authentication/authorization
     * No API changes
     * Previous Basic Auth (API Key and Security Token) support works as it did before
 * **0.0.4 (2014 Mar 11)** - Add support for missing Carvoyant APIs
