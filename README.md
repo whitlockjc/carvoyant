@@ -6,11 +6,14 @@ this library has complete feature parity with the documented Carvoyant API Refer
 
 ## Release Notes
 
-* **0.0.5 (TBD)** - Cleanup the API
+* **0.0.6 (TBD)** - Cleanup the API
     * Go to event-based model for all APIs to get away from callback hell
     * Stop passing each API argument as a function argument (use `function (options, cb)`)
     * Refactor out of single client.js into more specific modules
     * Implement code coverage in the tests
+* **0.0.5 (2014 May 7)** - Added support for OAuth authentication/authorization
+    * No API changes
+    * Previous Basic Auth (API Key and Security Token) support works as it did before
 * **0.0.4 (2014 Mar 11)** - Add support for missing Carvoyant APIs
     * [Account APIs][carvoyant-account-apis]
     * [Constraint APIs][carvoyant-constraint-apis]
@@ -65,7 +68,10 @@ Now that you've installed it into your project, here is an example HTML snippet 
 <script src="bower_components/carvoyant/carvoyant.js"></script>
 <!-- <script src="bower_components/carvoyant/carvoyant.min.js"></script> -->
 <script>
-var client = carvoyant.createClient({apiKey: '...', securityToken: '...'});
+// New style authentication/authorization
+var client = carvoyant.createClient({accessToken: '...'});
+// Old style authentication/authorization
+// var client = carvoyant.createClient({apiKey: '...', securityToken: '...'});
 </script>
 <!-- ... -->
 ```
@@ -81,11 +87,45 @@ npm install carvoyant --save
 At this point, you can use the module like any other:
 
 ```javascript
-var client = require('carvoyant').createClient({apiKey: '...', securityToken: '...'});
+// New style authentication/authorization
+var client = require('carvoyant').createClient({accessToken: '...'});
+// Old style authentication/authorization
+// var client = require('carvoyant').createClient({apiKey: '...', securityToken: '...'});
 ````
 
 For more details on what APIs are available and how to use them, please use the source until I can get the
 items listed at the bottom of the page complete.
+
+## Client Configuration
+
+Below is a list of client configuration options:
+
+* **accessToken (required if using OAuth):** This is the OAuth access token *(0.0.5+)*
+* **apiKey (required if not using OAuth):** This is the API Key *(This support will be phased out by Carvoyant)*
+* **securityToken (required if not using OAuth):** This is the Security Token *(This support will be phased out by
+Carvoyant)*
+* **apiUrl (optional):** This is the URL to use for the Carvoyant API
+
+### OAuth
+
+As of 0.0.5, the preferred way to interact with the Carvoyant API is OAuth.  The Carvoyant JavaScript API does not
+provide any of the OAuth facilities and requires you to give it an OAuth access token.  The reason for this is that
+real OAuth typically has a user driven portion and for a JavaScript API, there's no guarantee that there will be
+facilities to support this process.  For example, there is no bundled server component that would function as an
+OAuth callback to exchange an auth code for an access token.  Even if there was, there'd be no way to ship that in
+the browser, a feature I've worked very hard to make possible.
+
+All of that being said, you are responsible for obtaining the OAuth access token.  The way I do this for development
+is I created a [Carvoyant Application][carvoyant-application] and using that application, I will request an access
+token in the browser using a URL like this:
+`https://auth.carvoyant.com/OAuth/authorize?client_id={applicationKey}&response_type=token&redirect_uri=noredirect`.
+This URL will prompt you for your Carvoyant user credentials and once you successfully provide them, a nice UI will
+display giving you your access token.  I will then put that in my `test/client_config.js` to run the test suite.
+It's not ideal but this also isn't something that needs to be done a lot.  It's also not something I can control.
+
+Of course, for a real world application with a server-side component, you could do the full OAuth handshake process
+to do this in a more secure fashion.  For more details on the OAuth implementation for the Carvoyant API, please view
+the [Carvoyant OAuth Documentation][carvoyant-oauth].
 
 ## Development
 
@@ -125,9 +165,11 @@ You can also generate [JSDoc](http://usejsdoc.org/) documentation using `grunt j
 incorporated into the build/release cycle so we can host the API documentation online.)
 
 [carvoyant-account-apis]: http://confluence.carvoyant.com/display/PUBDEV/Account
+[carvoyant-application]: https://developer.carvoyant.com/
 [carvoyant-constraint-apis]: http://confluence.carvoyant.com/display/PUBDEV/Constraint
 [carvoyant-dashboard]: https://dash.carvoyant.com/
 [carvoyant-event-notification-apis]: http://confluence.carvoyant.com/display/PUBDEV/EventNotification
 [carvoyant-event-subscription-apis]: http://confluence.carvoyant.com/display/PUBDEV/EventSubscription
+[carvoyant-oauth]: http://confluence.carvoyant.com/pages/viewpage.action?pageId=3343280
 [carvoyant-vehicle-apis]: http://confluence.carvoyant.com/display/PUBDEV/Vehicle
 [pr1]: https://github.com/whitlockjc/carvoyant/pull/1

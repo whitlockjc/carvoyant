@@ -20,60 +20,38 @@ var _ = {
     isUndefined: require('lodash.isundefined'),
     map: require('lodash.map')
   }
-  , Carvoyant = require('..')
+  , Carvoyant = require('../lib/carvoyant')
   , realConfig = require('./client_config')
   , Client = Carvoyant.Client
   , createdVehicle // This will be created once to avoid unnecessary cleanup
   , createdEventSubscription;
+
+if (!realConfig.accessToken && !(realConfig.apiKey && realConfig.securityToken)) {
+  console.log('Your client_config.js is missing either an accessToken.');
+  console.log('Please view the project documentation on how to obtain these: https://github.com/whitlockjc/carvoyant');
+  throw new Error('Invalid test/client_config.js.');
+}
+
+/**
+ * By default, the Carvoyant APIs are throttled so sleep to avoid issue.
+ */
+exports.tearDown = function (cb) {
+  setTimeout(function () {
+    cb();
+  }, 1000);
+};
 
 /**
  * Test that an empty {@link Client} constructor throws an error.
  */
 exports.testEmptyClientOptions = function (test) {
 
-  // Ensure an Error is thrown (We'll test for specific Error messages below)
-  test.throws(function () {
-
+  try {
     new Client();
-
-  }, Error);
-
-  // Obligatory nodeunit completion signal
-  test.done();
-
-};
-
-/**
- * Test that a missing **apiKey** {@link Client} option throws the appropriate error.
- */
-exports.testMissingClientAPIKey = function (test) {
-
-  try {
-    new Client({
-      securityToken: 'fakeSecurityToken'
-    });
-    test.fail('Creating a Client without an apiKey should fail.');
+    test.fail('Creating a Client without an accessToken should fail.');
   } catch (err) {
-    test.strictEqual('options.apiKey is a required Client option.', err.message);
-  }
-
-  // Obligatory nodeunit completion signal
-  test.done();
-
-};
-
-/**
- * Test that a missing **securityToken** {@link Client} option throws the appropriate error.
- */
-exports.testMissingClientSecurityToken = function (test) {
-
-  try {
-    new Client({
-      apiKey: 'fakeAPIKey'
-    });
-    test.fail('Creating a Client without a securityToken should fail.');
-  } catch (err) {
-    test.strictEqual('options.securityToken is a required Client option.', err.message);
+    test.strictEqual('options.accessToken or both options.apiKey and options.securityToken are required.',
+                     err.message);
   }
 
   // Obligatory nodeunit completion signal
@@ -94,8 +72,30 @@ exports.testNewClient = function (test) {
 
   test.strictEqual(client.apiKey, fakeConfig.apiKey);
   test.strictEqual(client.securityToken, fakeConfig.securityToken);
+  test.ok(!client.accessToken);
   // TODO: Rewrite this to access the exposed default URL
   test.strictEqual(client.apiUrl, 'https://dash.carvoyant.com/api');
+
+  // Obligatory nodeunit completion signal
+  test.done();
+
+};
+
+/**
+ * Test creating a new {@link Client} with accessToken.
+ */
+exports.testNewOAuthClient = function (test) {
+
+  var fakeConfig = {
+      accessToken: 'fakeAccessToken'
+    }
+    , client = new Client(fakeConfig);
+
+  test.strictEqual(client.accessToken, fakeConfig.accessToken);
+  test.ok(!client.apiKey);
+  test.ok(!client.securityToken);
+  // TODO: Rewrite this to access the exposed default URL
+  test.strictEqual(client.apiUrl, 'https://api.carvoyant.com/v1/api');
 
   // Obligatory nodeunit completion signal
   test.done();
@@ -108,14 +108,12 @@ exports.testNewClient = function (test) {
 exports.testNewClientWithCustomApiUrl = function (test) {
 
   var fakeConfig = {
-      apiKey: 'fakeAPIKey',
-      securityToken: 'fakeSecurityToken',
-      apiUrl: 'http://dev.carvoyant.com/api'
+      accessToken: 'fakeAccessToken',
+      apiUrl: 'https://api.carvoyant.com/v2/api'
     }
     , client = new Client(fakeConfig);
 
-  test.strictEqual(client.apiKey, fakeConfig.apiKey);
-  test.strictEqual(client.securityToken, fakeConfig.securityToken);
+  test.strictEqual(client.accessToken, fakeConfig.accessToken);
   test.strictEqual(client.apiUrl, fakeConfig.apiUrl);
 
   // Obligatory nodeunit completion signal
@@ -177,6 +175,8 @@ exports.testCreateVehicle = function (test) {
 
   try {
     client.createVehicle();
+
+    test.fail('Creating a Vehicle without vehicleData should fail.');
   } catch (err) {
     test.ok(err instanceof TypeError);
     test.strictEqual('vehicleData must be defined.', err.message);
@@ -206,6 +206,8 @@ exports.testUpdateVehicle = function (test) {
 
   try {
     client.updateVehicle();
+
+    test.fail('Updating a Vehicle without vehicleData should fail.');
   } catch (err) {
     test.ok(err instanceof TypeError);
     test.strictEqual('vehicleData must be defined.', err.message);
@@ -213,6 +215,8 @@ exports.testUpdateVehicle = function (test) {
 
   try {
     client.updateVehicle({label: 'Testing'});
+
+    test.fail('Creating a Vehicle without vehicleData.vehicleId should fail.');
   } catch (err) {
     test.ok(err instanceof TypeError);
     test.strictEqual('vehicleData.vehicleId must be defined.', err.message);
@@ -305,6 +309,8 @@ exports.testListTripsInvalidArguments = function (test) {
       query[invalidValue.key] = invalidValue.value;
 
       client.vehicleTrips('Fake', null, query);
+
+      test.fail('Listing Vehicle trips with invalid request should fail.');
     } catch (err) {
       test.ok(err instanceof TypeError);
       test.strictEqual(invalidValue.message, err.message);
@@ -370,6 +376,8 @@ exports.testMakeRequestInvalidArgument = function (test) {
       query[invalidValue.key] = invalidValue.value;
 
       client.vehicleTrips('Fake', null, query);
+
+      test.fail('Listing Vehicle trips with invalid request should fail.');
     } catch (err) {
       test.ok(err instanceof TypeError);
       test.strictEqual(invalidValue.message, err.message);
@@ -404,6 +412,8 @@ exports.testVehicleDataInvalidArgument = function (test) {
       query[invalidValue.key] = invalidValue.value;
 
       client.vehicleData('Fake', null, query);
+
+      test.fail('Getting Vehicle data with invalid request should fail.');
     } catch (err) {
       test.ok(err instanceof TypeError);
       test.strictEqual(invalidValue.message, err.message);
@@ -425,6 +435,8 @@ exports.testVehicleData = function (test) {
 
   try {
     client.vehicleData();
+
+    test.fail('Getting Vehicle data without vehicleId should fail.');
   } catch (err) {
     test.ok(err instanceof TypeError);
     test.strictEqual('vehicleId must be defined.', err.message);
@@ -454,6 +466,8 @@ exports.testVehicleDataSet = function (test) {
 
   try {
     client.vehicleDataSet();
+
+    test.fail('Getting Vehicle data set without vehicleId should fail.');
   } catch (err) {
     test.ok(err instanceof TypeError);
     test.strictEqual('vehicleId must be defined.', err.message);
@@ -482,6 +496,8 @@ exports.testCreateEventSubscription = function (test) {
 
   try {
     client.createEventSubscription();
+
+    test.fail('Creating Event subscription without vehicleId should fail.');
   } catch (err) {
     test.ok(err instanceof TypeError);
     test.strictEqual('vehicleId must be defined.', err.message);
@@ -489,6 +505,8 @@ exports.testCreateEventSubscription = function (test) {
 
   try {
     client.createEventSubscription(createdVehicle.vehicleId);
+
+    test.fail('Creating Event subscription without eventType should fail.');
   } catch (err) {
     test.ok(err instanceof TypeError);
     test.strictEqual('eventType must be defined.', err.message);
@@ -496,6 +514,8 @@ exports.testCreateEventSubscription = function (test) {
 
   try {
     client.createEventSubscription(createdVehicle.vehicleId, 'lowBattery');
+
+    test.fail('Creating Event subscription without eventSubscription should fail.');
   } catch (err) {
     test.ok(err instanceof TypeError);
     test.strictEqual('eventSubscription must be defined.', err.message);
@@ -503,7 +523,8 @@ exports.testCreateEventSubscription = function (test) {
 
   client.createEventSubscription(createdVehicle.vehicleId, 'lowBattery', {
     minimumTime: 20,
-    postUrl: 'https://consumer.org/receive'
+    postUrl: 'https://consumer.org/receive',
+    notificationPeriod: 'ONETIME'
   }, function (res) {
 
     test.strictEqual(200, res.status);
@@ -526,6 +547,8 @@ exports.testEventSubscriptionsWithoutType = function (test) {
 
   try {
     client.eventSubscriptions();
+
+    test.fail('Getting Event subscription without vehicleId should fail.');
   } catch (err) {
     test.ok(err instanceof TypeError);
     test.strictEqual('vehicleId must be defined.', err.message);
@@ -573,6 +596,8 @@ exports.testEventSubscriptionDetailsWithoutType = function (test) {
 
   try {
     client.eventSubscriptionDetails();
+
+    test.fail('Getting Event subscription details without vehicleId should fail.');
   } catch (err) {
     test.ok(err instanceof TypeError);
     test.strictEqual('vehicleId must be defined.', err.message);
@@ -580,6 +605,8 @@ exports.testEventSubscriptionDetailsWithoutType = function (test) {
 
   try {
     client.eventSubscriptionDetails(createdVehicle.vehicleId);
+
+    test.fail('Getting Event subscription details without eventSubscriptionId should fail.');
   } catch (err) {
     test.ok(err instanceof TypeError);
     test.strictEqual('eventSubscriptionId must be defined.', err.message);
@@ -625,6 +652,8 @@ exports.testUpdateEventSubscriptionWithoutType = function (test) {
 
   try {
     client.updateEventSubscription();
+
+    test.fail('Updating Event subscription without vehicleId should fail.');
   } catch (err) {
     test.ok(err instanceof TypeError);
     test.strictEqual('vehicleId must be defined.', err.message);
@@ -632,6 +661,8 @@ exports.testUpdateEventSubscriptionWithoutType = function (test) {
 
   try {
     client.updateEventSubscription(createdVehicle.vehicleId);
+
+    test.fail('Updating Event subscription without eventSubscription should fail.');
   } catch (err) {
     test.ok(err instanceof TypeError);
     test.strictEqual('eventSubscription must be defined.', err.message);
@@ -685,6 +716,8 @@ exports.testDeleteEventSubscriptionWithoutType = function (test) {
 
   try {
     client.deleteEventSubscription();
+
+    test.fail('Deleting Event subscription without vehicleId should fail.');
   } catch (err) {
     test.ok(err instanceof TypeError);
     test.strictEqual('vehicleId must be defined.', err.message);
@@ -692,6 +725,8 @@ exports.testDeleteEventSubscriptionWithoutType = function (test) {
 
   try {
     client.deleteEventSubscription(createdVehicle.vehicleId);
+
+    test.fail('Getting Event subscription without eventSubscriptionId should fail.');
   } catch (err) {
     test.ok(err instanceof TypeError);
     test.strictEqual('eventSubscriptionId must be defined.', err.message);
@@ -699,7 +734,8 @@ exports.testDeleteEventSubscriptionWithoutType = function (test) {
 
   client.createEventSubscription(createdVehicle.vehicleId, 'troubleCode', {
     minimumTime: 20,
-    postUrl: 'https://consumer.org/receive'
+    postUrl: 'https://consumer.org/receive',
+    notificationPeriod: 'ONETIME'
   }, function (res) {
 
     var subscription = res.body.subscription;
@@ -780,6 +816,8 @@ exports.testVehicleConstraints = function (test) {
 
   try {
     client.vehicleConstraints();
+
+    test.fail('Getting Vehicle constraints without vehicleId should fail.');
   } catch (err) {
     test.ok(err instanceof TypeError);
     test.strictEqual('vehicleId must be defined.', err.message);
@@ -811,20 +849,15 @@ exports.testConstraintDetails = function (test) {
 
   try {
     client.vehicleConstraints();
+
+    test.fail('Getting Vehicle constraint details without vehicleId should fail.');
   } catch (err) {
     test.ok(err instanceof TypeError);
     test.strictEqual('vehicleId must be defined.', err.message);
   }
 
   try {
-    client.vehicleConstraints(createdVehicle.vehicleId);
-  } catch (err) {
-    test.ok(err instanceof TypeError);
-    test.strictEqual('constraintId must be defined.', err.message);
-  }
-
-  try {
-    client.vehicleConstraints(createdVehicle.vehicleId, function (res) {
+    client.vehicleConstraints(realConfig.vehicleIdWithConstraints, function (res) {
 
       // Should never happen, here just to make the test fail when it does
       test.ok(res.status === 0);
@@ -832,6 +865,8 @@ exports.testConstraintDetails = function (test) {
     }, {
       activeOnly: 123
     });
+
+    test.fail('Getting Vehicle constraint with invalid request should fail.');
   } catch (err) {
     test.ok(err instanceof TypeError);
     test.strictEqual('activeOnly must be a Boolean.', err.message);
@@ -881,9 +916,9 @@ exports.testNextPageAndPrevPage = function (test) {
         test.ok(_.contains(actions, 'previous'));
         test.ok(_.contains(actions, 'next'));
 
-        client.prevPage(res2, function (res4) {
+        client.prevPage(res2, function (res3) {
 
-          test.ok(!_.contains(_.map(res4.body.actions, function (action) { return action.name; }), 'previous'));
+          test.ok(!_.contains(_.map(res3.body.actions, function (action) { return action.name; }), 'previous'));
 
           // Obligatory nodeunit completion signal
           test.done();
@@ -913,6 +948,8 @@ exports.testEventNotificationsWithoutType = function (test) {
 
   try {
     client.eventNotifications();
+
+    test.fail('Getting Event notifications without vehicleId should fail.');
   } catch (err) {
     test.ok(err instanceof TypeError);
     test.strictEqual('vehicleId must be defined.', err.message);
@@ -980,6 +1017,8 @@ exports.testEventNotificationDetailsWithoutType = function (test) {
 
   try {
     client.eventNotificationDetails();
+
+    test.fail('Getting Event notification details without vehicleId should fail.');
   } catch (err) {
     test.ok(err instanceof TypeError);
     test.strictEqual('vehicleId must be defined.', err.message);
@@ -987,6 +1026,8 @@ exports.testEventNotificationDetailsWithoutType = function (test) {
 
   try {
     client.eventNotificationDetails(createdVehicle.vehicleId);
+
+    test.fail('Getting Event notifications without eventNotificationId should fail.');
   } catch (err) {
     test.ok(err instanceof TypeError);
     test.strictEqual('eventNotificationId must be defined.', err.message);
@@ -1024,6 +1065,8 @@ exports.testEventNotificationDetailsWithType = function (test) {
 
   try {
     client.eventNotificationDetails(createdVehicle.vehicleId);
+
+    test.fail('Getting Event notification details without eventNotificationId should fail.');
   } catch (err) {
     test.ok(err instanceof TypeError);
     test.strictEqual('eventNotificationId must be defined.', err.message);

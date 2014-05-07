@@ -8,12 +8,12 @@ module.exports = function(grunt) {
   grunt.initConfig({
     browserify: {
       options: {
-        debug: true
+        bundleOptions: {
+          debug: true,
+          standalone: 'carvoyant'
+        }
       },
       browser: {
-        options: {
-          standalone: 'carvoyant'
-        },
         files: {
           'carvoyant.js': ['lib/carvoyant.js']
         }
@@ -48,7 +48,7 @@ module.exports = function(grunt) {
       },
       test: {
         src: ['test/**/*_test.js']
-      },
+      }
     },
     karma: {
       browser: {

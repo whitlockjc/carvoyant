@@ -1,8 +1,15 @@
 module.exports = {
+  // The Carvoyant API supports Basic Auth and OAuth for authentication/authorization.  When configuring your client or
+  // client test configuration, use either the accessToken property or both the apiKey and securityToken properties.
+
+  // Your OAuth Access Token
+  accessToken: '...',
   // Your Carvoyant API Key
   apiKey: '...',
-  // Your Carvoyant API Security Token
+  // Your Carvoyant Security Token
   securityToken: '...',
+  // The API Url for Carvoyant (optional)
+  apiUrl: '...',
   // This is the vehicle id that has real trip data for the trip API tests. (read-only)
   // The reason for this is there is no way to test the trip details API without live data and we use trip data to
   // test pagination and since there is no API to create trip data programmatically, we need a live id.
