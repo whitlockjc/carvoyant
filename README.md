@@ -73,7 +73,7 @@ Now that you've installed it into your project, here is an example HTML snippet 
 <script>
 // New style authentication/authorization
 var client = carvoyant.createClient({accessToken: '...'});
-// Old style authentication/authorization
+// Old (deprecated) style authentication/authorization
 // var client = carvoyant.createClient({apiKey: '...', securityToken: '...'});
 </script>
 <!-- ... -->
