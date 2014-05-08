@@ -1094,3 +1094,30 @@ exports.testEventNotificationDetailsWithType = function (test) {
   }
 
 };
+
+/**
+ * Test that calls to {@link Client#deleteVehicle} works as expected.
+ */
+exports.testDeleteVehicle = function (test) {
+  var client = new Client(realConfig);
+
+  try {
+    client.deleteVehicle();
+
+    test.fail('Deleting a Vehicle without vehicleId should fail.');
+  } catch (err) {
+    test.ok(err instanceof TypeError);
+    test.strictEqual('vehicleId must be defined.', err.message);
+  }
+
+  client.deleteVehicle(createdVehicle.vehicleId, function (res) {
+    // Right now, deleting a vehicle that has any kind of data associated with it, which our test vehicles will, will
+    // not work.  This test is written based on that fact and while it's not ideal, the API call itself isn't broken.
+
+    test.strictEqual(400, res.status);
+    test.strictEqual('Could not delete. Validation errors.', res.body.error.detail);
+
+    // Obligatory nodeunit completion signal
+    test.done();
+  });
+};

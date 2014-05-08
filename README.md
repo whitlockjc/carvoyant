@@ -6,11 +6,16 @@ this library has complete feature parity with the documented Carvoyant API Refer
 
 ## Release Notes
 
-* **0.0.6 (TBD)** - Cleanup the API
+* **0.0.7 (TBD)** - Cleanup the API
     * Go to event-based model for all APIs to get away from callback hell
     * Stop passing each API argument as a function argument (use `function (options, cb)`)
     * Refactor out of single client.js into more specific modules
     * Implement code coverage in the tests
+* **0.0.6 (2014 May 8)** - 0.0.5 Follow Up
+    * Marked constraint APIs as deprecated (No warning when using, just code/documentation level)
+    * Added Client constructor API documentation (Including deprecation markers for API Key and Security Token)
+    * Added `deleteVehicle` API (Known Issue: Deleting a vehicle with **any** data will fail)
+    * Removed constraint related Known Issues since the APIs are deprecated
 * **0.0.5 (2014 May 6)** - Added support for OAuth authentication/authorization
     * No API changes
     * Previous Basic Auth (API Key and Security Token) support works as it did before
@@ -29,15 +34,13 @@ this library has complete feature parity with the documented Carvoyant API Refer
 
 Below are a list of known (as of this writing) issues/inconsistencies with the upstream Carvoyant API:
 
-* No API for deleting a vehicle (Has an impact on testing and API completeness)
 * No API to create trip data (Makes sense but this has an impact on testing)
 * No API to create/update/delete constraints (Has an impact on testing and API completeness)
 * No API to create event notifications (Makes sense but has an impact on testing)
-* Constraint update API seems broken (Creates a new constraint instead of updating the existing one)
-* Constraint, event notification, event subscription and vehicle list APIs return 404 instead for an empty list instead
-of a 200 with empty array (This is just an inconsistency that might cause you issues in using the API without knowing)
-* Some list APIs return plural form (constraints, subscriptions, notifications) while the rest do not (This is just an
-inconsistency that might cause you issues in using the API without knowing)
+* Some list APIs return plural form (subscriptions, notifications) while the rest do not (This is just an inconsistency
+that might cause you issues in using the API without knowing)
+* `client.deleteVehicle` is implemented but the backend will not allow you to delete a vehicle with any data.  This
+means that while the API is there, it will likely fail until Carvoyant's APIs support it.
 
 ## Usage
 
@@ -89,7 +92,7 @@ At this point, you can use the module like any other:
 ```javascript
 // New style authentication/authorization
 var client = require('carvoyant').createClient({accessToken: '...'});
-// Old style authentication/authorization
+// Old (deprecated) style authentication/authorization
 // var client = require('carvoyant').createClient({apiKey: '...', securityToken: '...'});
 ````
 
@@ -101,9 +104,10 @@ items listed at the bottom of the page complete.
 Below is a list of client configuration options:
 
 * **accessToken (required if using OAuth):** This is the OAuth access token *(0.0.5+)*
-* **apiKey (required if not using OAuth):** This is the API Key *(This support will be phased out by Carvoyant)*
-* **securityToken (required if not using OAuth):** This is the Security Token *(This support will be phased out by
-Carvoyant)*
+* **apiKey (required if not using OAuth):** **(deprecated)** This is the API Key *(This support will be phased out
+by Carvoyant)*
+* **securityToken (required if not using OAuth):** **(deprecated)** This is the Security Token *(This support will
+be phased out by Carvoyant)*
 * **apiUrl (optional):** This is the URL to use for the Carvoyant API
 
 ### OAuth
